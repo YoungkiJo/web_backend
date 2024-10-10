@@ -7,3 +7,5 @@
 /FastAPI/app/services/__pycache__
 /FastAPI/app/utils/__pycache__
 
+/Gin/go.sum
+/Gin/deploy/
