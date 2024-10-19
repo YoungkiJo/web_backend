@@ -2,4 +2,6 @@ from pydantic import BaseModel
 
 
 class Item(BaseModel):
-    a: int
+    masterid: str
+
+    data: Optional[]
