@@ -1,11 +1,10 @@
 from pydantic_settings import BaseSettings
 
-
-
-class Settings(BaseSettings):
+class run_settings(BaseSettings):
     host: str
-    port: int
-    api1: str
+    port:int
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
+        

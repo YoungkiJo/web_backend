@@ -1,11 +1,13 @@
 
+/FastAPI_old/
+
 /FastAPI/poetry.lock
-/FastAPI/app/api/__pycache__
-/FastAPI/app/core/__pycache__
-/FastAPI/app/db/__pycache__
-/FastAPI/app/schemas/__pycache__
-/FastAPI/app/services/__pycache__
-/FastAPI/app/utils/__pycache__
+/FastAPI/src/app/configs/__pycache__/
+/FastAPI/src/app/routers/__pycache__/
+/FastAPI/src/app/schemas/__pycache__/
+/FastAPI/src/app/services/__pycache__/
+
+
 
 /Gin/go.sum
 /Gin/deploy/
