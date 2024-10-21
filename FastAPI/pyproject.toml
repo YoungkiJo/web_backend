@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fastapi-project"
+name = "python-framework"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
@@ -8,9 +8,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.115.2"
-uvicorn = "^0.32.0"
 pydantic = "^2.9.2"
 pydantic-settings = "^2.6.0"
+uvicorn = "^0.32.0"
+requests = "^2.32.3"
 
 
 [build-system]
