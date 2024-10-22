@@ -1,44 +1,38 @@
-from . import event
+from configs.config import setting
+from schemas.schema import ui2simul, ui2simul_confirm
+
 
 from fastapi import APIRouter
+from concurrent.futures import ThreadPoolExecutor
 import asyncio
 
 router = APIRouter()
 
+executor = ThreadPoolExecutor(max_workers=setting().thread)
 tasks = dict()
-queues = dict()
 
-@router.get("/")
-def root():
-    return {"message": "Hello"}
+@router.post("/start")
+async def start_simulation(item: ui2simul):
+    global tasks
 
-@router.post("/item")
-async def start_simulation(item):
+    masterid = item.masterid
 
-    if len(queues) > 0:
-        return {"message":"동작중"}
-
-    if item.id not in queues:
-        queues[item.id] = asyncio.Queue()
+    if masterid in tasks and not tasks[masterid].done():
+        return {"message": f"simulation is already running for {masterid}"}
     
-    task = simulation(queues[item.id])
+    task = simulation()
+    tasks[masterid] = asyncio.create_task(task.run())
 
-    tasks[item.id] = asyncio.create_task(task.run())
-    asyncio.create_task(tasks[item.id])
-
-    return {"message": "Start"}
+    return {"message": "Simulation start"}
 
 @router.get("/confirm")
-async def confirm_simulation(item):
-    if item.id not in queues:
-        print(f"No queue found for tastk {item.id}")
-        return
-    
-    result = await queues[item.id].get()
-    print(f"Task {item.id} intermediate result: {result}")
-    queues[item.id].task_done()
-    
+async def confirm_simulation(item: ui2simul_confirm):
+    global tasks
 
+    masterid = item.masterid
+
+    if masterid in tasks and not tasks[masterid].done():
+        return {"message": f"simulation is already running for {masterid}"}
 
     
 
