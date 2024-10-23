@@ -2,37 +2,38 @@ from configs.config import setting
 from schemas.schema import ui2simul, ui2simul_confirm
 
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
 
 router = APIRouter()
 
 executor = ThreadPoolExecutor(max_workers=setting().thread)
-tasks = dict()
+threads = dict()
 
 @router.post("/start")
 async def start_simulation(item: ui2simul):
-    global tasks
+    if item.masterid in threads:
+        raise HTTPException(status_code=400, detail="Simulation already running.")
+ 
+    task = simulation(item)
+    future = asyncio.create_task(task.run())
 
-    masterid = item.masterid
-
-    if masterid in tasks and not tasks[masterid].done():
-        return {"message": f"simulation is already running for {masterid}"}
-    
-    task = simulation()
-    tasks[masterid] = asyncio.create_task(task.run())
+    threads[item.masterid] = {
+        "task": task,
+        "future": future
+    }
 
     return {"message": "Simulation start"}
 
 @router.get("/confirm")
 async def confirm_simulation(item: ui2simul_confirm):
-    global tasks
+    if item.masterid not in threads:
+        raise HTTPException(status_code=404, detail="Simulation not found.")
 
-    masterid = item.masterid
+    task = threads[item.masterid]["task"]
 
-    if masterid in tasks and not tasks[masterid].done():
-        return {"message": f"simulation is already running for {masterid}"}
+    print(task.result)
 
     
 
