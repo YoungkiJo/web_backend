@@ -1,40 +1,36 @@
-from configs.config import setting
-from schemas.schema import ui2simul, ui2simul_confirm
+from . import threads, executor
+from schemas.schema import ui2simul
+from services.service import simulation
 
-
-from fastapi import APIRouter, HTTPException
-from concurrent.futures import ThreadPoolExecutor
+from fastapi import APIRouter
 import asyncio
+from concurrent.futures import Future
 
 router = APIRouter()
 
-executor = ThreadPoolExecutor(max_workers=setting().thread)
-threads = dict()
 
 @router.post("/start")
 async def start_simulation(item: ui2simul):
-    if item.masterid in threads:
-        raise HTTPException(status_code=400, detail="Simulation already running.")
- 
-    task = simulation(item)
-    future = asyncio.create_task(task.run())
+    # 실행중인 thread 개수 확인
+    if len(threads) >= 1:
+        return {"message": "Simulation is running"}
+    elif item.masterid in threads:
+        return {"message": f"ID {item.masterid} Simulation is running"}
 
+    # 시뮬레이션 작업 실행
+    task = simulation(item)
+    loop = asyncio.get_running_loop()
+    future: Future = loop.run_in_executor(executor, task.run)
+
+    # threads 관리
     threads[item.masterid] = {
         "task": task,
         "future": future
     }
 
-    return {"message": "Simulation start"}
+    # 작업이 완료되면 threads 삭제
+    future.add_done_callback(lambda _: threads.pop(item.masterid, None))
 
-@router.get("/confirm")
-async def confirm_simulation(item: ui2simul_confirm):
-    if item.masterid not in threads:
-        raise HTTPException(status_code=404, detail="Simulation not found.")
-
-    task = threads[item.masterid]["task"]
-
-    print(task.result)
-
-    
+    return {"message": "Simulation started"}
 
 

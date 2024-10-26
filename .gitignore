@@ -4,3 +4,5 @@
 /FastAPI/app/configs/__pycache__/
 /FastAPI/app/routers/__pycache__/
 /FastAPI/app/schemas/__pycache__/
+
+/Gin/go.sum

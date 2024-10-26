@@ -1,3 +1,6 @@
-import asyncio
+from configs.config import setting
 
-event = asyncio.Event()
+from concurrent.futures import ThreadPoolExecutor
+
+threads = dict()
+executor = ThreadPoolExecutor(max_workers=setting().thread)
